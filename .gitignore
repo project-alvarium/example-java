@@ -1,3 +1,16 @@
+#Ignore working directories used by IDEs, etc
+.vscode/
+.idea/
+
+#eclipse generated files
+.project
+.settings
+.classpath
+.metadata
+
+# Maven build folder
+target/
+
 # Compiled class file
 *.class
 
