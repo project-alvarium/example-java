@@ -1,0 +1,32 @@
+[sdk]
+annotators = [ "tpm", "pki" ]
+
+  [sdk.hash]
+  type = "sha256"
+
+[sdk.signature.public]
+type = "ed25519"
+path = "./src/resources/public.key"
+
+[sdk.signature.private]
+type = "ed25519"
+path = "./src/resources/private.key"
+
+  [sdk.stream]
+  type = "mqtt"
+
+    [sdk.stream.config]
+    clientId = "alvarium-test"
+    qos = 0
+    user = "mosquitto"
+    password = ""
+    cleanness = false
+    topics = [ "alvarium-test-topic" ]
+
+      [sdk.stream.config.provider]
+      host = "localhost"
+      protocol = "tcp"
+      port = 1_883
+
+[logging]
+minLogLevel = "debug"
