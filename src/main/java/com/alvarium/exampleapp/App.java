@@ -7,10 +7,10 @@ import config.ReaderFactory;
 import config.ReaderType;
 
 public class App{
-  public static void main( String[] args ) throws ReaderException{
+  public static void main( String[] args ) throws ReaderException {
     ReaderFactory factory = new ReaderFactory();
     Reader reader = factory.getReader(ReaderType.JSON);
-    SdkInfo sdkInfo= reader.read("./src/main/resources/config.json");
+    SdkInfo sdkInfo = reader.read("./src/main/resources/config.json");
   }
 
 }
