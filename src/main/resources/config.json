@@ -7,11 +7,11 @@
       "signature": {
         "public": {
           "type": "ed25519",
-          "path": "./src/resources/public.key"
+          "path": "./src/main/resources/public.key"
         },
         "private": {
           "type": "ed25519",
-          "path": "./src/resources/private.key"
+          "path": "./src/main/resources/private.key"
         }
       },
       "stream": {
