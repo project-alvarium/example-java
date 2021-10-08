@@ -41,9 +41,9 @@ public class App {
     final Sdk sdk = new DefaultSdk(annotators, sdkInfo, logger);
 
     // init channels and observers
-    final Channel<SampleData> createChannel = new Channel<SampleData>();
-    final Channel<SampleData> mutateChannel = new Channel<SampleData>();
-    final Channel<SampleData> transitChannel = new Channel<SampleData>();
+    final Channel<SampleData> creationChannel = new Channel<SampleData>();
+    final Channel<SampleData> mutationChannel = new Channel<SampleData>();
+    final Channel<SampleData> transitionChannel = new Channel<SampleData>();
 
     //TODO(Ali Amin): Instantiate a creation observer and register it to the create channel
     
