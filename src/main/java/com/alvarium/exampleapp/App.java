@@ -1,9 +1,16 @@
 package com.alvarium.exampleapp;
 
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.alvarium.DefaultSdk;
 import com.alvarium.Sdk;
 import com.alvarium.SdkInfo;
 import com.alvarium.exampleapp.observers.Channel;
+import com.alvarium.exampleapp.observers.CreationObserver;
+import com.alvarium.sign.KeyInfo;
+import com.alvarium.sign.SignException;
 import com.alvarium.annotators.Annotator;
 import com.alvarium.annotators.AnnotatorException;
 import com.alvarium.annotators.AnnotatorFactory;
@@ -15,10 +22,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
+import sun.misc.Signal;
+
 import config.Reader;
 import config.ReaderException;
 import config.ReaderFactory;
 import config.ReaderType;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.exceptions.Exceptions;
 
 public class App {
   public static void main(String[] args) throws ReaderException, AnnotatorException,
@@ -45,9 +56,55 @@ public class App {
     final Channel<SampleData> mutationChannel = new Channel<SampleData>();
     final Channel<SampleData> transitionChannel = new Channel<SampleData>();
 
-    //TODO(Ali Amin): Instantiate a creation observer and register it to the create channel
-    
-    sdk.close();
-  }
+    final Observer<SampleData> creationObserver = new CreationObserver(sdk, mutationChannel);
+    creationChannel.registerObserver(creationObserver);
 
+    // Get keyInfo to generate new sample data
+    final KeyInfo keyInfo = new KeyInfo(
+      sdkInfo.getSignature().getPrivateKey().getPath(),
+      sdkInfo.getSignature().getPrivateKey().getType()
+    );
+
+    final Timer timer = new Timer();
+    final TimerTask generateData = new TimerTask() {
+      @Override
+      public void run() {
+        try {
+          final SampleData data = new SampleData(keyInfo);
+          creationChannel.publish(data);
+        } catch(SignException e ) {
+          Exceptions.propagate(e);
+        } catch(IOException e) {
+          Exceptions.propagate(e);
+        }
+      }
+    };
+
+    // Data creation loop which will run every 1000ms 
+    timer.scheduleAtFixedRate(generateData, 0, 1000);
+
+    // Calls sdk.close() and closes all channels
+    final Runnable dispose = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          sdk.close();
+          creationChannel.close();
+          mutationChannel.close();
+          transitionChannel.close();
+          System.exit(0);
+        } catch(StreamException e) {
+          Exceptions.propagate(e);
+          System.out.println("Could not shutdown gracefully");
+        }
+      }
+    };
+
+    // Catch SIGINT to shutdown gracefully
+    Signal.handle(new Signal("INT"), signal -> dispose.run());
+
+    // Catch SIGTERM to shutdown gracefully
+    Signal.handle(new Signal("TERM"), signal -> dispose.run());
+
+  }
 }
