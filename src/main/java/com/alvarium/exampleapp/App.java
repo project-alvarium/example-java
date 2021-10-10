@@ -11,6 +11,7 @@ import com.alvarium.exampleapp.observers.Channel;
 import com.alvarium.exampleapp.observers.CreationObserver;
 import com.alvarium.sign.KeyInfo;
 import com.alvarium.sign.SignException;
+import com.alvarium.exampleapp.observers.TransitionObserver;
 import com.alvarium.annotators.Annotator;
 import com.alvarium.annotators.AnnotatorException;
 import com.alvarium.annotators.AnnotatorFactory;
@@ -58,6 +59,8 @@ public class App {
 
     final Observer<SampleData> creationObserver = new CreationObserver(sdk, mutationChannel);
     creationChannel.registerObserver(creationObserver);
+    final Observer <SampleData> transitionObserver = new TransitionObserver(sdk);
+    transitionChannel.registerObserver(transitionObserver);
 
     // Get keyInfo to generate new sample data
     final KeyInfo keyInfo = new KeyInfo(
@@ -79,7 +82,7 @@ public class App {
         }
       }
     };
-
+    
     // Data creation loop which will run every 1000ms 
     timer.scheduleAtFixedRate(generateData, 0, 1000);
 
