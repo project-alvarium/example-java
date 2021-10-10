@@ -25,6 +25,7 @@ import com.alvarium.exampleapp.observers.CreationObserver;
 import com.alvarium.sign.KeyInfo;
 import com.alvarium.sign.SignException;
 import com.alvarium.exampleapp.observers.TransitionObserver;
+import com.alvarium.exampleapp.observers.MutationObserver;
 import com.alvarium.annotators.Annotator;
 import com.alvarium.annotators.AnnotatorException;
 import com.alvarium.annotators.AnnotatorFactory;
@@ -76,10 +77,15 @@ public class App {
     transitionChannel.registerObserver(transitionObserver);
 
     // Get keyInfo to generate new sample data
-    final KeyInfo keyInfo = new KeyInfo(
-      sdkInfo.getSignature().getPrivateKey().getPath(),
-      sdkInfo.getSignature().getPrivateKey().getType()
+    final KeyInfo keyInfo = sdkInfo.getSignature().getPrivateKey();
+    
+
+    final Observer<SampleData> mutationObserver = new MutationObserver(
+      sdk, 
+      keyInfo, 
+      transitionChannel
     );
+    mutationChannel.registerObserver(mutationObserver);
 
     final Timer timer = new Timer();
     final TimerTask generateData = new TimerTask() {
